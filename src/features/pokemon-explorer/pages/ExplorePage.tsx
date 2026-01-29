@@ -95,7 +95,7 @@ export const ExplorePage = () => {
             {searchResults?.length === 0 && !isSearchingLoading && (
               <div className="col-span-full text-center py-20">
                 <p className="text-xl text-gray-400 font-medium">Nothing found... 😢</p>
-                <p className="text-sm text-gray-400">Try searching for "Pikachu" or "Fire"</p>
+                <p className="text-sm text-gray-400">Try searching for "Pikachu"</p>
               </div>
             )}
           </>

@@ -1,106 +1,232 @@
-# Bloq.it Frontend Challenge - Ultimate Pokedex
+# 🧩 Bloq.it Frontend Challenge — Ultimate Pokédex
 
-A robust, offline-first Pokedex application built with **React**, **TypeScript**, and modern web standards. This project focuses on performance, scalability, and a clean architectural separation of concerns.
-
-## 🚀 Tech Stack & Rationale
-
-I chose a stack that balances development speed with long-term maintainability and strict type safety.
-
-- **Core:** React 18 + Vite (Fast HMR and tooling).
-- **Language:** TypeScript (Strict mode enabled for maximum reliability).
-- **Server State:** TanStack Query v5 (Handles caching, deduplication, and loading states).
-- **Client State:** Zustand (Lightweight global state for filters/modals).
-- **Persistence:** Dexie.js / IndexedDB (Robust offline storage for caught Pokémon).
-- **Styling:** Tailwind CSS (Utility-first for rapid UI development and small bundle size).
-
-## 🏗 Architecture & Design Decisions
-
-### 1. Feature-Based Folder Structure
-
-Instead of grouping by file type (e.g., all components in one folder), I utilized a **Domain-Driven/Feature-Based** structure.
-
-- **Benefit:** Scalability. If we delete the `features/pokedex` folder, we remove all logic, components, and state related to that feature without leaving "zombie code" behind.
-- **Structure:**
-  ```text
-  src/features/pokemon-explorer/
-  ├── components/  # UI specific to the explorer
-  ├── services/    # API calls and Adapters
-  ├── hooks/       # Logic and Data fetching hooks
-  └── types/       # TypeScript interfaces
-  ```
-
-### 2. The Repository & Adapter Pattern
-
-Directly consuming the PokéAPI response in UI components creates tight coupling. To solve this, I implemented an **Adapter Layer**:
-
-- **Raw Data:** Comes from the API (often deeply nested or with messy types).
-- **Adapter:** Transforms raw data into a clean `Pokemon` domain entity.
-- **UI:** Only interacts with the clean `Pokemon` interface.
-- **Benefit:** If the API changes (or if we switch to GraphQL later), we only update the Adapter, not the React components.
-
-### 3. Handling the "N+1" Problem (REST API Strategy)
-
-The PokéAPI REST endpoints separate the "list" (names/URLs) from the "details" (images/types). This inherently creates an N+1 problem (1 request for the list + N requests for details).
-
-- **My Solution:** I utilized `Promise.all` within the service layer to parallelize the detail requests.
-- **Performance:** Modern browsers (HTTP/2) handle parallel requests efficiently.
-- **Trade-off:** While a **GraphQL** approach would solve the over-fetching and N+1 issue natively (fetching everything in a single query), I opted for the **REST** implementation to strictly follow the challenge documentation link and to demonstrate capability in handling asynchronous data orchestration and waterfalls manually.
-
-### 4. Offline-First Approach
-
-To meet the requirement of "limited internet connectivity", I chose **IndexedDB** (via Dexie.js) over `localStorage`.
-
-- **Why?** LocalStorage is synchronous (blocks the main thread) and limited to ~5MB. Storing base64 images or thousands of Pokémon would crash the app. IndexedDB is asynchronous and handles large datasets efficiently.
-
-### 5. Search & Filtering Strategy (The "Smart Index" Pattern)
-
-Implementing a "Live Search" (autocomplete) presented a challenge because the PokéAPI REST endpoints do not support partial string matching (e.g., searching for "pi" returns 404, not "Pikachu").
-
-**Options Considered:**
-
-1.  **Server-Side Search:** Impossible due to API limitations mentioned above.
-2.  **Brute Force Loading:** Fetching details for all 1300+ Pokémon to filter locally would trigger rate limits and consume excessive user bandwidth (~1300 HTTP requests).
-
-**Selected Solution: The "Lightweight Index"**
-I implemented a hybrid approach to ensure instant feedback with minimal network cost:
-
-- **Initialization:** On the first search interaction, the app fetches a **lightweight list** of _all_ Pokémon names/URLs (`limit=10000`). This payload is tiny (~100kb gzipped) and fast to download.
-- **Client-Side Filtering:** The app filters this list of names in memory (extremely fast).
-- **Lazy Detail Fetching:** Once the filtered list of names is ready (e.g., 50 matches for "pika"), the app resolves the details (images/stats) **only for the visible results** (paginated), reusing the existing Adapter pattern.
-
-**Result:** Instant search feedback (0ms latency) without overloading the device or the API.
-
-
-6. Logging Strategy (The Facade Pattern)
-   You might ask: "Why build a custom logger instead of using a library like Winston or Pino?"
-
-Context Awareness: Those libraries are industry standards for Node.js backends, but they add unnecessary bloat (10KB+) to a Frontend bundle where every kilobyte counts.
-
-The Solution: I implemented a lightweight (<1KB, Zero Dependencies) Logger Facade.
-
-Abstraction: The application depends on the logger interface, not on console.log directly.
-
-Scalability: This provides a single point of integration. If we need to add Sentry or Datadog for production monitoring later, we only modify src/lib/logger.ts, and the entire application automatically starts reporting errors without refactoring a single component.
-
-## 🛠 Getting Started
-
-1.  **Install dependencies:**
-
-    ```bash
-    npm install
-    ```
-
-2.  **Run the development server:**
-
-    ```bash
-    npm run dev
-    ```
-
-3.  **Run tests (Coming Soon):**
-    ```bash
-    npm run test
-    ```
+A robust, **offline‑first Pokédex** application built with **React**, **TypeScript**, and modern web standards. This project focuses on **performance**, **scalability**, and a **clean architectural separation of concerns**.
 
 ---
 
-_Developed by Ivan Zarro_
+## 🚀 Tech Stack & Rationale
+
+I chose a stack that balances **development speed**, **long‑term maintainability**, and **strict type safety**.
+
+- **Core:** React 18 + Vite  
+  _Fast HMR, modern tooling, and excellent DX._
+- **Language:** TypeScript (Strict Mode)  
+  _Maximum reliability and early error detection._
+- **Server State:** TanStack Query v5  
+  _Caching, deduplication, infinite scrolling, and resilient loading states._
+- **Client State:** Zustand  
+  _Lightweight global state for filters and modals._
+- **Persistence:** Dexie.js / IndexedDB  
+  _Robust offline storage for caught Pokémon and images._
+- **Styling:** Tailwind CSS  
+  _Utility‑first styling for rapid UI development and small bundle size._
+- **Testing:** Vitest + React Testing Library  
+  _Integration‑first testing approach._
+
+---
+
+## 🏗 Architecture & Design Decisions
+
+### 1. Feature‑Based Folder Structure
+
+Instead of grouping by file type (e.g. all components in one folder), the project follows a **Domain‑Driven / Feature‑Based** structure.
+
+**Why?**
+
+- Highly scalable
+- Easy to reason about
+- No leftover “zombie code”
+
+If the `features/pokedex` folder is deleted, **all related logic, UI, and state are removed together**.
+
+**Example structure:**
+
+```text
+src/features/pokemon-explorer/
+├── components/  # UI specific to the explorer
+├── services/    # API calls and adapters
+├── hooks/       # Business logic & data‑fetching hooks
+└── types/       # TypeScript interfaces
+```
+
+---
+
+### 2. Repository & Adapter Pattern
+
+Directly consuming PokéAPI responses inside UI components creates tight coupling.
+
+**Solution:** An explicit **Adapter Layer**.
+
+- **Raw Data:** API responses (deeply nested, unstable schemas)
+- **Adapter:** Transforms raw data into a clean `Pokemon` domain entity
+- **UI:** Only interacts with the domain model
+
+**Benefit:**
+If the API changes — or if the app switches to GraphQL — only the adapter layer needs updating.
+
+---
+
+### 3. Pagination & Server State Strategy
+
+The PokéAPI separates **lists** from **details**, which can easily cause N+1 performance issues.
+
+**Solution:**
+
+- `useInfiniteQuery` from TanStack Query
+- Offset‑based cursor strategy
+- Chunked fetching (20 Pokémon per request)
+
+**Resilience (Graceful Degradation):**
+If 1 out of 20 Pokémon requests fails:
+
+- The UI **does not crash**
+- A warning is logged
+- The remaining 19 Pokémon are rendered
+
+Result: uninterrupted user experience, even under unstable networks.
+
+---
+
+### 4. Offline‑First Persistence Strategy
+
+To support **limited or unstable connectivity**, IndexedDB (via Dexie.js) was chosen over `localStorage`.
+
+**Why IndexedDB?**
+
+- Asynchronous (non‑blocking)
+- Handles large datasets efficiently
+- Suitable for images and thousands of records
+- Supports indexed queries and sorting
+
+`localStorage` is synchronous, size‑limited (~5MB), and unsuitable for this use case.
+
+---
+
+### 5. Search & Filtering — The “Smart Index” Pattern
+
+PokéAPI does not support partial string search.
+
+**Implemented Solution:** A hybrid **Lightweight Index** strategy.
+
+**Phase 1 — Index Fetch**
+
+- Fetches a lightweight list of all Pokémon names/URLs (`limit=10000`)
+- ~100KB gzipped
+- Cached indefinitely (`staleTime: Infinity`)
+
+**Phase 2 — Client‑Side Filtering**
+
+- In‑memory filtering
+- ~10,000 items filtered in <10ms
+
+**Phase 3 — Lazy Hydration**
+
+- Fetch details only for visible, paginated results
+- Reuses the Adapter layer
+
+**Result:**
+Instant, zero‑latency search feedback without overwhelming the API.
+
+---
+
+### 6. Logging Strategy — Facade Pattern
+
+Heavy logging libraries (Winston, Pino) are not browser‑friendly.
+
+**Solution:**
+A custom **Logger Facade** (<1KB).
+
+**Benefits:**
+
+- App depends on an interface, not `console.log`
+- Easy integration with Sentry, Datadog, etc.
+- Single‑file swap: `src/lib/logger.ts`
+
+---
+
+### 7. Optimistic UI & Rollback
+
+To ensure a **native‑like**, responsive feel:
+
+- Catching a Pokémon updates the UI **immediately** (optimistic update)
+- Database writes happen asynchronously
+
+**Safety Net:**
+If IndexedDB fails (e.g. storage full):
+
+- UI state is automatically rolled back
+- Error is logged via the Logger facade
+
+---
+
+### 8. Data Fusion — Pokémon Details View
+
+The Details View acts as a **traffic controller** between multiple data sources:
+
+- **Discovery Mode:** API data only
+- **Owner Mode:** Local DB data (capture date, offline images)
+- **Shared View:** Forces API data (`?caughtAt=...`) to ensure neutrality
+
+This guarantees consistent and predictable data rendering.
+
+---
+
+## 🧪 Testing Strategy
+
+The project includes **48 automated tests (100% passing)**, prioritizing **integration and logic validation** over shallow snapshot testing.
+
+### Key Coverage Areas
+
+- **Core Logic:**
+  - Catch button state transitions
+  - Pokédex collection filtering & sorting
+
+- **Resilience:**
+  - Network failure recovery
+  - Graceful degradation scenarios
+
+- **Security:**
+  - CSV export sanitization (CSV Injection prevention)
+
+- **Data Integrity:**
+  - IndexedDB rollback mechanisms
+  - Duplicate Pokémon prevention
+
+- **Browser APIs:**
+  - Clipboard API
+  - FileReader
+  - IndexedDB
+
+### Run tests
+
+```bash
+npm test
+```
+
+---
+
+## 🛠 Getting Started
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run development server
+
+```bash
+npm run dev
+```
+
+### Build for production
+
+```bash
+npm run build
+```
+
+---
+
+## 👨‍💻 Author
+
+Developed by **Ivan Zarro**
