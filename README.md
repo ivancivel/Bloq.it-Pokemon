@@ -1,10 +1,10 @@
-#  Bloq.it Frontend Challenge — Ultimate Pokédex
+# Bloq.it Frontend Challenge — Ultimate Pokédex
 
 A robust, **offline‑first Pokédex** application built with **React**, **TypeScript**, and modern web standards. This project focuses on **performance**, **scalability**, and a **clean architectural separation of concerns**.
 
 ---
 
-##  Tech Stack & Rationale
+## Tech Stack & Rationale
 
 I chose a stack that balances **development speed**, **long‑term maintainability**, and **strict type safety**.
 
@@ -25,30 +25,26 @@ I chose a stack that balances **development speed**, **long‑term maintainabili
 
 ---
 
-##  Architecture & Design Decisions
+## Architecture & Design Decisions
 
-### 1. Feature‑Based Folder Structure
+### 1. Hybrid Feature-Based Architecture
 
-Instead of grouping by file type (e.g. all components in one folder), the project follows a **Domain‑Driven / Feature‑Based** structure.
+The project follows a **Domain‑Driven** structure, separating "Feature" code from "Shared" code.
 
-**Why?**
+- **Features (`src/features/`):** Contains logic, state, and UI specific to a domain (e.g., Pokedex, Explorer). If a feature is deleted, its code vanishes cleanly.
+- **Shared (`src/components/`):** Reusable UI atoms/molecules used across multiple features (e.g., `PokemonCard`, `CatchButton`).
 
-- Highly scalable
-- Easy to reason about
-- No leftover “zombie code”
+**Structure Overview:**
 
-If the `features/pokedex` folder is deleted, **all related logic, UI, and state are removed together**.
-
-**Example structure:**
-
-```text
-src/features/pokemon-explorer/
-├── components/  # UI specific to the explorer
-├── services/    # API calls and adapters
-├── hooks/       # Business logic & data‑fetching hooks
-└── types/       # TypeScript interfaces
-```
-
+````text
+src/
+├── components/          # Shared UI (Buttons, Cards, Inputs)
+└── features/
+    └── pokemon-explorer/
+        ├── components/  # UI specific ONLY to this feature
+        ├── services/    # API calls and adapters
+        ├── hooks/       # Business logic & data‑fetching
+        └── types/       # TypeScript interfaces
 ---
 
 ### 2. Repository & Adapter Pattern
@@ -173,7 +169,7 @@ This guarantees consistent and predictable data rendering.
 
 ##  Testing Strategy
 
-The project includes **48 automated tests (100% passing)**, prioritizing **integration and logic validation** 
+The project includes **48 automated tests (100% passing)**, prioritizing **integration and logic validation**
 
 ### Key Coverage Areas
 
@@ -201,11 +197,11 @@ The project includes **48 automated tests (100% passing)**, prioritizing **integ
 
 ```bash
 npm test
-```
+````
 
 ---
 
-##  Getting Started
+## Getting Started
 
 ### Install dependencies
 
