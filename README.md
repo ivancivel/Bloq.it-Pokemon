@@ -1,10 +1,10 @@
-# 🧩 Bloq.it Frontend Challenge — Ultimate Pokédex
+#  Bloq.it Frontend Challenge — Ultimate Pokédex
 
 A robust, **offline‑first Pokédex** application built with **React**, **TypeScript**, and modern web standards. This project focuses on **performance**, **scalability**, and a **clean architectural separation of concerns**.
 
 ---
 
-## 🚀 Tech Stack & Rationale
+##  Tech Stack & Rationale
 
 I chose a stack that balances **development speed**, **long‑term maintainability**, and **strict type safety**.
 
@@ -25,7 +25,7 @@ I chose a stack that balances **development speed**, **long‑term maintainabili
 
 ---
 
-## 🏗 Architecture & Design Decisions
+##  Architecture & Design Decisions
 
 ### 1. Feature‑Based Folder Structure
 
@@ -227,6 +227,6 @@ npm run build
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 Developed by **Ivan Zarro**
