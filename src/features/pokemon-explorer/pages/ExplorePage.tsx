@@ -17,7 +17,7 @@ import { useState } from 'react';
 import { usePokemonList } from '../hooks/usePokemonList';
 import { usePokemonSearch } from '../hooks/usePokemonSearch';
 import { PokemonSearch } from '../components/PokemonSearch';
-import { PokemonCard } from '../components/PokemonCard';
+import { PokemonCard } from '../../../components/PokemonCard';
 
 export const ExplorePage = () => {
   // --- 0. LOCAL STATE (State Hoisting) ---

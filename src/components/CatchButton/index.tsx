@@ -53,12 +53,6 @@ export const CatchButton = ({ pokemon, className, disabled = false }: CatchButto
       disabled={isCaught || disabled}
       aria-label={label}
       title={label} // Tooltip for mouse users
-      // DYNAMIC STYLING (Utility-First)
-      // We use 'clsx' for clean conditional class composition.
-      // 1. Base: Circular shape, shadows, transitions.
-      // 2. State (Caught): White background, red border, static cursor.
-      // 3. State (Disabled): Grayed out, reduced opacity.
-      // 4. State (Active/Uncaught): Hover effects, scale animation, pointer cursor.
       className={clsx(
         'p-2 rounded-full transition-all duration-200 shadow-md border-2 group relative',
         isCaught
@@ -69,13 +63,7 @@ export const CatchButton = ({ pokemon, className, disabled = false }: CatchButto
         className
       )}
     >
-      <IconComponent
-        className={clsx(
-          'w-7 h-7 transition-transform duration-200',
-          // Visual feedback: The icon turns red when hovered (if uncaught)
-          isCaught ? 'text-red-600' : 'text-gray-600 group-hover:text-red-600'
-        )}
-      />
+      <IconComponent className={clsx('w-7 h-7 ')} />
     </button>
   );
 };

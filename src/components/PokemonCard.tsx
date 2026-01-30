@@ -16,9 +16,9 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Pokemon } from '../services/pokemon.service';
-import { CatchButton } from '../../../components/CatchButton';
-import { getPokemonColors, CARD_YELLOW } from '../utils/pokemon-visuals';
+import { Pokemon } from '../features/pokemon-explorer/services/pokemon.service';
+import { CatchButton } from './CatchButton';
+import { getPokemonColors, CARD_YELLOW } from '../features/pokemon-explorer/utils/pokemon-visuals';
 import { Check, Circle, FileEdit } from 'lucide-react';
 
 interface PokemonCardProps {
@@ -70,7 +70,7 @@ export const PokemonCard = ({
       // Applies the specific type-based gradient and border color.
       style={{
         background: bg,
-        borderColor: isSelected ? '#ef4444' : CARD_YELLOW, // Visual feedback for selection
+        borderColor: isSelected ? '#ff0000' : CARD_YELLOW, // Visual feedback for selection
       }}
       /**
        * CSS ARCHITECTURE & MOBILE OPTIMIZATION
@@ -94,13 +94,13 @@ export const PokemonCard = ({
         md:active:scale-95
         tap-highlight-transparent
         ${!selectionMode ? 'md:hover:-translate-y-1' : ''}
-        ${isSelected ? 'scale-95 ring-4 ring-red-400 ring-offset-2' : ''} 
+        ${isSelected ? 'scale-95' : ''} 
       `}
     >
       {/* --- LAYER 1: SELECTION INDICATOR --- */}
       {/* Conditionally rendered to reduce DOM nodes when not needed */}
       {selectionMode && (
-        <div className="absolute -top-3 -left-3 z-30">
+        <div className="absolute -top-3 -right-3 z-30">
           <div
             className={`
               rounded-full p-1 shadow-md transition-colors duration-200
