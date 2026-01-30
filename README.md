@@ -167,6 +167,32 @@ This guarantees consistent and predictable data rendering.
 
 ---
 
+## 9. Security & Data Integrity (Defense in Depth)
+
+The application implements multiple layers of protection to ensure user data safety and system resilience:
+
+### 1. Runtime Type Safety (Zod)
+While TypeScript provides compile-time checks, we utilize **Zod** in the `pokedex.store.ts` to perform strict **Runtime Validation**. Every Pokémon object is validated against a schema before it is persisted in IndexedDB. This prevents:
+- "Poisoned" data injection via the browser console.
+- API anomalies from polluting the local database.
+- Inconsistent data states in the UI.
+
+### 2. Content Security Policy (CSP)
+A strict **CSP** is implemented via a Meta Tag in `index.html` to act as a final browser-level safeguard:
+- **XSS Protection:** Disables inline script execution.
+- **Data Exfiltration Prevention:** Restricts network requests (`connect-src`) strictly to the official PokéAPI domain.
+- **Image Source Control:** Whitelists only trusted domains (GitHub, TeamTailor) and local `data:` URIs for offline images.
+
+### 3. CSV Injection Prevention
+The `csv-export.ts` utility implements a sanitization layer that neutralizes potentially malicious characters (like `=`, `+`, `-`, `@`) in user-generated content (notes) before generating the export file.
+
+### 4. Input Sanitization
+User-generated notes are strictly sanitized:
+- **Trimming:** Removes unnecessary whitespace.
+- **Size Limiting:** Enforces a `MAX_NOTE_LENGTH` (200 chars) to prevent database bloating and UI overflow attacks.
+
+
+---
 ## Testing Strategy
 
 The project includes **48 automated tests (100% passing)**, prioritizing **integration and logic validation**

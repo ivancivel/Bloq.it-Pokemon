@@ -15,14 +15,40 @@
  */
 
 import { create } from 'zustand';
+import { z } from 'zod';
 import { db, CaughtPokemon } from '../../../lib/db';
 import { logger } from '../../../lib/logger';
 import { convertImageUrlToBase64 } from '../utils/image-utils';
 
+/**
+ * ZOD SCHEMA DEFINITION (Runtime Data Integrity)
+ * * ENGINEERING PRINCIPLE: Runtime Type Safety
+ * While TypeScript provides compile-time safety, Zod ensures that data
+ * injected via the browser console or API anomalies matches our expected
+ * domain model before touching the database.
+ */
+const PokemonValidationSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string().min(1).max(100),
+  // Validates that imageUrl is either a proper URL or a Base64 encoded image string
+  imageUrl: z.string().url().or(z.string().startsWith('data:image/')),
+  types: z.array(z.string()).min(1),
+  height: z.number().nonnegative(),
+  weight: z.number().nonnegative(),
+  stats: z.object({
+    hp: z.number().int().nonnegative(),
+    attack: z.number().int().nonnegative(),
+    defense: z.number().int().nonnegative(),
+    specialAttack: z.number().int().nonnegative(),
+    specialDefense: z.number().int().nonnegative(),
+    speed: z.number().int().nonnegative(),
+  }),
+  note: z.string().optional(),
+});
+
 interface PokedexState {
   caughtIds: Set<number>;
   isInitialized: boolean;
-
   initialize: () => Promise<void>;
   catchPokemon: (pokemon: Omit<CaughtPokemon, 'caughtAt'>) => Promise<void>;
   releasePokemon: (ids: number[]) => Promise<void>;
@@ -52,6 +78,18 @@ export const usePokedexStore = create<PokedexState>((set, get) => ({
 
   // --- 2. CATCH ACTION (The Complex One) ---
   catchPokemon: async (pokemon) => {
+    /**
+     * DATA INTEGRITY CHECK (ZOD)
+     * We validate the incoming object before any state changes occur.
+     * This prevents "poisoned" data from entering our optimistic UI or IndexedDB.
+     */
+    const validation = PokemonValidationSchema.safeParse(pokemon);
+
+    if (!validation.success) {
+      logger.error('Invalid Pokemon data detected! Capture aborted.', validation.error.format());
+      return;
+    }
+
     const currentIds = get().caughtIds;
 
     // SECURITY / INTEGRITY: Prevent duplicate IDs in the DB
