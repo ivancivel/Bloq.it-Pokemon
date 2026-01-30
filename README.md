@@ -173,7 +173,7 @@ This guarantees consistent and predictable data rendering.
 
 ##  Testing Strategy
 
-The project includes **48 automated tests (100% passing)**, prioritizing **integration and logic validation** over shallow snapshot testing.
+The project includes **48 automated tests (100% passing)**, prioritizing **integration and logic validation** 
 
 ### Key Coverage Areas
 
