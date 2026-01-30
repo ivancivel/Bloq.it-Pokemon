@@ -10,59 +10,48 @@
  * - Ensures the bar never has 0% width (min 2%) for visibility.
  */
 
-import { Award } from 'lucide-react';
 import { CaughtPokemon } from '../../../lib/db';
 import { usePokedexStats } from '../hooks/usePokedexStats';
 
 interface Props {
   pokemons: CaughtPokemon[];
+  className?: string;
 }
 
-export const PokedexStatsHeader = ({ pokemons }: Props) => {
+export const PokedexStatsHeader = ({ pokemons, className = '' }: Props) => {
   const stats = usePokedexStats(pokemons);
 
   if (!stats) return null;
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 animate-in slide-in-from-top-4 duration-700">
-      <div className="flex flex-col sm:flex-row items-center gap-6">
-        {/* STATS BADGE */}
-        <div className="flex items-center gap-4 min-w-max">
-          <div className="p-3 bg-red-50 text-red-600 rounded-xl">
-            <Award size={28} />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-              Pokédex Progress
-            </p>
-            <h3 className="text-2xl font-extrabold text-gray-800 leading-none">
-              {stats.percentageText}%{' '}
-              <span className="text-sm text-gray-400 font-medium">Complete</span>
-            </h3>
+    <div
+      className={`flex items-center gap-2 md:gap-4 bg-white px-3 md:px-4 py-2 rounded-lg border border-gray-200 shadow-sm h-[42px] animate-in fade-in duration-500 ${className}`}
+    >
+      {/* 1. BADGE INFO (Esquerda) */}
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-baseline gap-1.5 text-sm whitespace-nowrap">
+          <span className="font-bold text-gray-900">{stats.caughtCount}</span>
+          <span className="text-gray-400 font-medium">/ {stats.totalCount}</span>
+          <span className="hidden sm:inline text-gray-400 text-xs font-medium ml-1">Caught</span>
+        </div>
+      </div>
+
+      {/* 2. PROGRESS BAR  */}
+
+      <div className="flex flex-1 items-center h-full pl-3 md:pl-4 border-l border-gray-100 ml-1 md:ml-2">
+        <div className="flex-1 w-full bg-gray-100 h-2 rounded-full overflow-hidden relative">
+          <div className="absolute inset-0 bg-gray-100 w-full h-full"></div>
+
+          <div
+            className="bg-red-600 h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
+            style={{ width: `${Math.max(stats.completionRate, 2)}%` }}
+          >
+            <div className="absolute top-0 left-0 bottom-0 right-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full -translate-x-full animate-[shimmer_2s_infinite]"></div>
           </div>
         </div>
-
-        {/* PROGRESS BAR */}
-        <div className="flex-1 w-full">
-          <div className="flex justify-between mb-2 text-xs font-semibold text-gray-500">
-            <span> </span>
-            <span>
-              {stats.caughtCount} / {stats.totalCount} Caught
-            </span>
-          </div>
-
-          <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden relative">
-            <div className="absolute inset-0 bg-gray-100 w-full h-full"></div>
-
-            {/* Dynamic Width Bar with Shimmer Effect */}
-            <div
-              className="bg-red-600 h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
-              style={{ width: `${Math.max(stats.completionRate, 2)}%` }}
-            >
-              <div className="absolute top-0 left-0 bottom-0 right-0 bg-gradient-to-r from-transparent via-white/20 to-transparent w-full -translate-x-full animate-[shimmer_2s_infinite]"></div>
-            </div>
-          </div>
-        </div>
+        <span className="ml-3 text-xs font-bold text-gray-400 w-[30px] text-right">
+          {stats.percentageText}%
+        </span>
       </div>
     </div>
   );
