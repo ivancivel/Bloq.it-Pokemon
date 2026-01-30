@@ -36,6 +36,7 @@ The project follows a **Domain‑Driven** structure, separating "Feature" code f
 
 **Structure Overview:**
 
+```text
 src/
 ├── components/          # Shared UI (Buttons, Cards, Inputs)
 └── features/
@@ -44,7 +45,7 @@ src/
         ├── services/    # API calls and adapters
         ├── hooks/       # Business logic & data‑fetching
         └── types/       # TypeScript interfaces
----
+```
 
 ### 2. Repository & Adapter Pattern
 
@@ -166,7 +167,7 @@ This guarantees consistent and predictable data rendering.
 
 ---
 
-##  Testing Strategy
+## Testing Strategy
 
 The project includes **48 automated tests (100% passing)**, prioritizing **integration and logic validation**
 
@@ -196,7 +197,7 @@ The project includes **48 automated tests (100% passing)**, prioritizing **integ
 
 ```bash
 npm test
-````
+```
 
 ---
 
