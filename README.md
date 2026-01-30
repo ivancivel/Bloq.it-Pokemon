@@ -36,7 +36,6 @@ The project follows a **Domain‑Driven** structure, separating "Feature" code f
 
 **Structure Overview:**
 
-````text
 src/
 ├── components/          # Shared UI (Buttons, Cards, Inputs)
 └── features/
